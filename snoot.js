@@ -44,21 +44,62 @@ function updateDays () {
     while (dates[28]) {
         deliveryDay.removeChild(dates[28])
     }
-    if (deliveryMonth.selectedIndex === -1) {
-        deliveryMonth.selectedIndex = 0;
+    if (deliveryYear.selectedIndex === -1) {
+        deliveryYear.selectedIndex = 0;
     }
-    // If Feb and 2020 - leap year twentyNine
-    
+    // If Feb and 2020 - leap year twentyNine 
+    if (selectedMonth === "2" && deliveryYear.options[deliveryYear.selectedIndex].value === "2020") {
+        deliveryDay.appendChild(twentyNine.cloneNode(true));
+    } 
     // Else 30 day - thirty
-    
+    else if (selectedMonth === "4" || selectedMonth === "6" || selectedMonth === "9" || selectedMonth === "11") {
+        deliveryDay.appendChild(thirty.cloneNode(true));
+    }
     // else 31 month - thirtyOne
+    else if (selectedMonth === "1" || selectedMonth === "3" || selectedMonth === "5" || selectedMonth === "7" || selectedMonth === "8" || selectedMonth === "10" || selectedMonth === "12") {
+        deliveryDay.appendChild(thirtyOne.cloneNode(true));
+    }
+}
+
+// funtction to see if custom message is checked
+function autoCheckCustom () {
+    var messageBox = document.getElementById("customText");
+    if (messageBox.value !== "" && messageBox.value !== messageBox.placeholder) { //textarea actually has something in it
+        document.getElementById("custom").checked = "checked";
+    }
+    else{ // textarea has nothing
+        document.getElementById("custom").checked = "";
+    }
 }
 
 // Functions to run on the page load
 function setUpPage () {
     removeSelectDefaults();
+    setUpDays();
+    createEventListeners(); 
 }
 
+// function to create our event listeners
+function createEventListeners () {
+     var deliveryMonth = document.getElementById("delivMo");
+        if(deliveryMonth.addEventListener) {
+            deliveryMonth.addEventListener("change",updateDays, false);
+        }else if (deliveryMonth.attachEvent) {
+            deliveryMonth.attachEvent("change", updateDays);
+        }
+    var deliveryYear = document.getElementById("delivYr");
+        if(deliveryYear.addEventListener) {
+            deliveryYear.addEventListener("change",updateDays, false);
+        }else if (deliveryYear.attachEvent) {
+            deliveryYear.attachEvent("onChange", updateDays);
+        }
+     var messageBox = document.getElementById("customText");
+        if(messageBox.addEventListener) {
+            messageBox.addEventListener("change", autoCheckCustom, false);
+        }else if (messageBox.attachEvent) {
+            messageBox.attachEvent("onChange", autoCheckCustom);
+        }
+}
 //Enable load event handlers
 if(window.addEventListener) {
     window.addEventListener("load",setUpPage, false);
