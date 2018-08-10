@@ -13,6 +13,7 @@
 var twentyNine = document.createDocumentFragment();
 var thirty = document.createDocumentFragment();
 var thirtyOne = document.createDocumentFragment();
+var formValidity = true;
 
 // Function to turn off select list defaults
 function removeSelectDefaults() {
@@ -72,12 +73,55 @@ function autoCheckCustom () {
     }
 }
 
+//function to copy delivery to billing adress
+function copyBillngAddress() {
+    var billingInputElements = document.querySelectorAll("#billingAddress input");
+    var deliveryInputElements = document.querySelectorAll("#deliveryAddress input");
+    // if checkbox checked - copy all fields
+    if (document.getElementById("sameAddr").checked) {
+        for(var i = 0; i < billingInputElements.length; i++){
+            deliveryInputElements[i+1].value = billingInputElements[i].value;
+        }
+        document.querySelector("#deliveryAddress select").value = document.querySelector("#billingAddress select").value;
+    }
+    //else erase all fields
+    else {
+        for(var i = 0; i < billingInputElements.length; i++){
+            deliveryInputElements[i+1].value = "";
+        }
+        document.querySelector("#deliveryAddress select").selectedIndex = -1;
+    }
+    
+}
+
 // Functions to run on the page load
 function setUpPage () {
     removeSelectDefaults();
     setUpDays();
     createEventListeners(); 
 }
+
+// function to validate entire form
+function validateForm(evt) {
+    if (evt.preventDefault) {
+        evt.preventDefault();
+    }
+    else {
+        evt.returnValue = false;
+    }
+    
+    if (formValidity === true) {
+        document.getElementById("errorText").innerHTML = "";
+        document.getElementById("errorText").style.display = "none";
+        document.getElementsByTagName("form")[0].submit();
+    }
+    else {
+        document.getElementById("errorText").innerHTML = "Please fix the indicated problems and then resubmit your order.";
+        document.getElementById("errorText").style.display = "block";
+        scroll(0,0);
+    }
+}
+
 
 // function to create our event listeners
 function createEventListeners () {
@@ -93,11 +137,23 @@ function createEventListeners () {
         }else if (deliveryYear.attachEvent) {
             deliveryYear.attachEvent("onChange", updateDays);
         }
-     var messageBox = document.getElementById("customText");
+    var messageBox = document.getElementById("customText");
         if(messageBox.addEventListener) {
             messageBox.addEventListener("change", autoCheckCustom, false);
         }else if (messageBox.attachEvent) {
             messageBox.attachEvent("onChange", autoCheckCustom);
+        }
+     var same = document.getElementById("sameAddr");
+        if(same.addEventListener) {
+            same.addEventListener("change", copyBillngAddress, false);
+        }else if (same.attachEvent) {
+            same.attachEvent("onChange", copyBillngAddress);
+        }   
+    var form = document.getElementsByTagName("form")[0];
+        if(form.addEventListener) {
+            form.addEventListener("submit", validateForm, false);
+        }else if (form.attachEvent) {
+            form.attachEvent("onsubmit", validateForm);
         }
 }
 //Enable load event handlers
